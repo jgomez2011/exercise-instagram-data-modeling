@@ -6,27 +6,56 @@ from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
+class Image(Base):
+    __tablename__ = "image"
+    id = Column(Integer, primary_key = True)
+    image_url = Column(String(300), nullable = False)
+    
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key = True)
+    username = Column(String(29), nullable = False, unique = True)
+    email = Column(String(55), nullable = False, unique = True)
+    Password = Column(String(30), nullable = False)
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+class Like(Base):
+    __tablename__ = "like"
+    id = Column(Integer, primary_key = True)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
-    def to_dict(self):
-        return {}
+class Post(Base):
+    __tablename__ = "post"
+    id = Column(Integer, primary_key = True)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable = False)
+    user = relationship(User)
+
+    image_id = Column(Integer, ForeignKey('image.id'), nullable = False)
+    image = relationship(Image)
+
+    like_id = Column(Integer, ForeignKey('like.id'), nullable = False)
+    like = relationship(Like)
+
+class Comment(Base):
+    __tablename__ = "comment"
+    id = Column(Integer, primary_key = True)
+    comment = Column(String(250))
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable = False)
+    user = relationship(User)
+
+    post_id = Column(Integer, ForeignKey('post.id'), nullable = False)
+    post = relationship(Post)
+
+class Feed(Base):
+    __tablename__ = "feed"
+    id = Column(Integer, primary_key = True)
+
+    post_id = Column(Integer, ForeignKey('post.id'), nullable = False)
+    post = relationship(Post)
+
 
 ## Draw from SQLAlchemy base
 try:
